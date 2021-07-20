@@ -9,3 +9,8 @@ never look at it again
 
 """
 
+import bs4
+import numpy as np
+import stattools
+
+test = np.linspace(0,10,10)
