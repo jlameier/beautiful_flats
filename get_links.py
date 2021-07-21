@@ -2,9 +2,9 @@
 
 some comment stuff
 first of: beautiful soup ebay kleinanzeigen
-make list of pages
+make list of pages - done
 get infos
-make dp
+make df
 dump df to sqlite3
 use pricing estimation
 be happy
@@ -37,14 +37,14 @@ def get_pages(seedlink, baselink, maxcount):
     #yield soup
     # next_page = soup.select("a.forward")
     for n in range(2, maxcount):
-        next_page = baselink.format(foo=str(n))
+        next_page = baselink.format(foo=str(maxcount-n))
         req = Request(next_page, headers={'User-Agent': 'Mozilla/5.0'})
         webpage = urlopen(req).read()
         soup = BeautifulSoup(webpage, features="html.parser")
         list_of_site_ads = soup.findAll(class_="aditem")
         dict_soup_ads[n] = list_of_site_ads
         print(len(list_of_site_ads), next_page)
-        time.sleep(randint(2, 6))
+        time.sleep(randint(2, 30))
 
     tmp = []
     for key in dict_soup_ads:
