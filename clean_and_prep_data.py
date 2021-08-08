@@ -12,7 +12,7 @@ import pandas as pd
 import re
 import numpy as np
 
-df = pd.read_csv("all_pd_ads_20210721-202013.csv")
+df = pd.read_csv("all_pd_ads_20210807-195436.csv")
 
 # remove column views and kill lines with NaN
 df = df.drop(columns='num_views')
@@ -31,7 +31,7 @@ def get_price_int(df):
             string_value = ''.join(string_value)
         #    string_value = string_value[0]+string_value[1]
             num_value = int(string_value)
-            if num_value > 20000000:
+            if num_value > 10000000:
                 list_return.append(np.nan)
             else:
                 list_return.append(num_value)
@@ -94,6 +94,22 @@ def get_num_furnishing(df):
             list_return.append(np.nan)
     return list_return
 
+def get_postid_int(df):
+    list_return = []
+    for index, row in df.iterrows():
+        obj_value = row['address']
+        string_value = re.findall(r'\d+', obj_value)
+        if string_value:
+            string_value = ''.join(string_value)
+            num_value = int(string_value)
+            if num_value < 100 or num_value > 99999:
+                list_return.append(np.nan)
+            else:
+                list_return.append(num_value)
+        else:
+            list_return.append(np.nan)
+    return list_return
+
 
 # construct df from transformed values
 d_num = {}
@@ -103,9 +119,14 @@ d_num['price'] = get_price_int(df)
 d_num['id'] = df['id']
 d_num['rooms'] = get_rooms_int(df)
 d_num['space'] = get_space_int(df)
+d_num['postID'] = get_postid_int(df)
+d_num['words'] = df['len_description']
 
 
 df_num = pd.DataFrame(d_num)
 df_num = df_num.dropna()
-df.to_csv('num_items_clean.csv')
+
+# check distribution and parameter correlation - check for dependency between variables
+
+df_num.to_csv('num_items_clean.csv')
 print("done")
