@@ -5,7 +5,7 @@ get soap from site - done
 process soap -done
 add to df - done
 dump df into sqlite3
-todo filter for multiple instances of the same link
+todo filter for multiple instances of the same link - done
 
 """
 import csv
@@ -16,7 +16,7 @@ import time
 import re
 from random import randint, shuffle
 
-path_to_linklist = '/home/jla/dev/beautiful_flats/all_hrefs_ads_20210807-140114.csv'
+path_to_linklist = '/home/jla/dev/beautiful_flats/all_hrefs_ads_20210924-222335.csv'
 baselink = 'https://www.ebay-kleinanzeigen.de'
 
 
@@ -122,8 +122,7 @@ def extract_info_d(soup, link):
 
 
 list_compl_links = get_links(path_to_linklist, baselink)
-# create dataframe and add dict from extract_info to df todo this comes later. first of: make list of all soups/returns (list of dics) and then convert to df
-# df = pd.DataFrame(index=range(len(list_compl_links)), columns= list(d_data.keys()))
+
 
 """
 link = "https://www.ebay-kleinanzeigen.de/s-anzeige/eigentumswohnung/1839253138-196-5681"
@@ -138,7 +137,7 @@ for cnt in range(len(list_compl_links)):
     beautiful_flats.append(extract_info_d(get_soup(list_compl_links[cnt]),list_compl_links[cnt]))
     time.sleep(randint(5, 20))
     print(cnt)
-    if cnt % 50 == 0:
+    if cnt % 50 == 0 or cnt == len(list_compl_links):
         timetag = time.strftime("%Y%m%d-%H%M%S")
         filename = 'all_pd_ads_{foo}.csv'
         filename = filename.format(foo=timetag)

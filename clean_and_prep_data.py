@@ -94,6 +94,7 @@ def get_num_furnishing(df):
             list_return.append(np.nan)
     return list_return
 
+
 def get_postid_int(df):
     list_return = []
     for index, row in df.iterrows():
