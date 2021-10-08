@@ -20,7 +20,7 @@ from tqdm import tqdm
 import re
 from random import randint, shuffle
 
-path_to_linklist = '/home/jla/dev/beautiful_flats/immonet_all_hrefs_ads_20210925-122719.csv'
+path_to_linklist = '/home/jla/dev/beautiful_flats/immonet_all_hrefs_ads_20211006-165339.csv'
 baselink = 'https://www.immonet.de'
 
 testlink= baselink + "/angebot/45224700"
@@ -165,7 +165,10 @@ if __name__ == '__main__':
     print("{cnt} beautiful flats found".format(cnt=len(list_compl_links)))
     num_iterations = (len(list_compl_links))
     for cnt in tqdm(range(num_iterations)):
-        beautiful_homes.append(extract_info_d(get_sel_soup(list_compl_links[cnt]), list_compl_links[cnt]))
+        try:
+            beautiful_homes.append(extract_info_d(get_sel_soup(list_compl_links[cnt]), list_compl_links[cnt]))
+        except:
+            print("fuck, selenium.common.exceptions.InvalidArgumentException: Message: invalid argument")
         #time.sleep(randint(5, 20))
         #print(" ", cnt, " / ", len(list_compl_links) )
         if cnt % 1000 == 0 or cnt == len(list_compl_links):

@@ -12,7 +12,7 @@ import pandas as pd
 import re
 import numpy as np
 
-df = pd.read_csv("all_pd_ads_20210807-195436.csv")
+df = pd.read_csv("immonet_all_pd_ads_20211007-221039.csv")
 
 # remove column views and kill lines with NaN
 df = df.drop(columns='num_views')

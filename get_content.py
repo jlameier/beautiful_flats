@@ -16,7 +16,7 @@ import time
 import re
 from random import randint, shuffle
 
-path_to_linklist = '/home/jla/dev/beautiful_flats/all_hrefs_ads_20210924-222335.csv'
+path_to_linklist = '/home/jla/dev/beautiful_flats/all_hrefs_ads_20211006-194612.csv'
 baselink = 'https://www.ebay-kleinanzeigen.de'
 
 

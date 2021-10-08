@@ -22,6 +22,8 @@ from random import randint
 from selenium import webdriver
 import re
 import csv
+from tqdm import tqdm
+
 
 seedlink = 'https://www.immonet.de/'
 seedlink_ext1 = 'haus-kaufen.html'
@@ -68,8 +70,8 @@ def get_pages(seedlink, baselink, maxcount):
         soup = BeautifulSoup(webpage, features="html.parser")
         list_of_site_ads = soup.findAll(class_="aditem")
         dict_soup_ads[n] = list_of_site_ads
-        print(len(list_of_site_ads), next_page)
-        time.sleep(randint(2, 30))
+        # print(len(list_of_site_ads), next_page)
+        #time.sleep(randint(2, 30))
 
     tmp = []
     for key in dict_soup_ads:
@@ -94,16 +96,19 @@ if __name__ == '__main__':
 
     # make list of hrefs from pages:
     href_lst = []
-    for iterator in range(1,max_num_pag):
-        soup = get_sel_soup(baselink + str(iterator))
-        #tags = soup.find_all(class_="flex-grow-1 display-flex flex-direction-column")
+    for iterator in tqdm(range(1,max_num_pag)):
+        try:
+            soup = get_sel_soup(baselink + str(iterator))
+            #tags = soup.find_all(class_="flex-grow-1 display-flex flex-direction-column")
 
-        for element in soup.find_all("a", onclick=True, href=True):
-            endpoint = element['href']
-            href_lst.append(endpoint)
-            # print(endpoint)
-        print(len(href_lst), iterator)
-        #time.sleep(randint(4, 16))
+            for element in soup.find_all("a", onclick=True, href=True):
+                endpoint = element['href']
+                href_lst.append(endpoint)
+                # print(endpoint)
+            # print(len(href_lst), iterator)
+            #time.sleep(randint(4, 16))
+        except:
+            print("chromium exception error")
 
         if iterator % int(0.1*max_num_pag) == 0 or iterator == max_num_pag:  # safe every 10% or at the end
             timetag = time.strftime("%Y%m%d-%H%M%S")

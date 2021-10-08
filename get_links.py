@@ -18,7 +18,23 @@ from bs4 import BeautifulSoup
 import time
 from random import randint
 import csv
-import pandas as pd
+import logging
+from tqdm import tqdm
+
+
+#################### Logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+
+file_handler = logging.FileHandler('logs/ebay_href.log')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+logging.debug("test")
+#############################
 
 seedlink = 'https://www.ebay-kleinanzeigen.de/s-wohnung-kaufen/wohnung-haus/k0c196'
 baselink = 'https://www.ebay-kleinanzeigen.de/s-wohnung-kaufen/seite:{foo}/wohnung-haus/k0c196'
@@ -36,15 +52,15 @@ def get_pages(seedlink, baselink, maxcount):
     dict_soup_ads[1] = list_of_site_ads
     #yield soup
     # next_page = soup.select("a.forward")
-    for n in range(2, maxcount):
+    for n in tqdm(range(2, maxcount)):
         next_page = baselink.format(foo=str(maxcount-n))
         req = Request(next_page, headers={'User-Agent': 'Mozilla/5.0'})
         webpage = urlopen(req).read()
         soup = BeautifulSoup(webpage, features="html.parser")
         list_of_site_ads = soup.findAll(class_="aditem")
         dict_soup_ads[n] = list_of_site_ads
-        print(len(list_of_site_ads), next_page)
-        time.sleep(randint(2, 30))
+        logger.debug('{} href found at site {}'.format(len(list_of_site_ads), next_page))
+        time.sleep(randint(2, 18))
 
     tmp = []
     for key in dict_soup_ads:
@@ -55,6 +71,7 @@ def find_hrefs(lst_aditems):
     lst_href = []
     for soup in lst_aditems:
         lst_href.append(soup.find('a')['href'])
+        logger.debug('href found {}'.format(soup.find('a')['href']))
     return lst_href
 
 
@@ -63,19 +80,15 @@ if __name__ == '__main__':
     all_ads = get_pages(seedlink, baselink, 50)
     # extract hrefs
     list_hrefs = find_hrefs(all_ads)
-    print(len(list_hrefs))
+    logger.info('number of href found: {}'.format(len(list_hrefs)))
+    # print(len(list_hrefs))
     timetag = time.strftime("%Y%m%d-%H%M%S")
     filename = 'all_hrefs_ads_{foo}.csv'
     filename = filename.format(foo=timetag)
+    filepath = "data_ebay"
 
-    with open(filename, 'w') as result_file:
+    with open(filepath + '/' + filename, 'w') as result_file:
         wr = csv.writer(result_file, dialect='excel', delimiter='\t')
         wr.writerow(list_hrefs)
+    logger.info('file saved as {}'.format(filename))
 
-"""
-req = Request('https://www.ebay-kleinanzeigen.de/s-wohnung-kaufen/wohnung-haus/k0c196', headers={'User-Agent': 'Mozilla/5.0'})
-webpage = urlopen(req).read()
-soup = BeautifulSoup(webpage)
-list_of_ads = soup.findAll(class_="aditem")
-print(list_of_ads)
-"""
