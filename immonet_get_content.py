@@ -10,17 +10,32 @@ dump df into sqlite3
 
 import csv
 import datetime
-
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from urllib.request import Request, urlopen
 import pandas as pd
 import time
 from tqdm import tqdm
-import re
+import logging
 from random import randint, shuffle
+import file_cleanup
 
-path_to_linklist = '/home/jla/dev/beautiful_flats/immonet_all_hrefs_ads_20211006-165339.csv'
+
+#################### Logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(message)s')
+
+file_handler = logging.FileHandler('logs/immonet_ads.log')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+logging.debug("test")
+#############################
+
+path_to_linklist = file_cleanup.get_latest_file('/home/jla/dev/beautiful_flats/data_immonet/hrefs')
 baselink = 'https://www.immonet.de'
 
 testlink= baselink + "/angebot/45224700"
@@ -62,88 +77,84 @@ def extract_info_d(soup, link):
         d_data['headline'] = soup.find("h1").get_text()
     except:
         d_data['headline'] = ''
-        print("headline error", link)
+        logger.info("headline error at{}".format(link))
     try:
         d_data['immonet_id'] = soup.find_all("p",class_="hidden-print")[0].get_text()
     except:
         d_data['immonet_id'] = ''
-        print("id1 error", link)
+        logger.info("immonet_id error at{}".format(link))
     try:
         d_data['seller_id'] = soup.find_all("p",class_="hidden-print")[1].get_text()
     except:
         d_data['seller_id'] = ''
-        print("id2 error", link)
+        logger.info("seller_id at {}".format(link))
     try:
         d_data['price'] = soup.find_all("div", {'id': 'priceid_1'})[0].get_text()
     except:
         d_data['price'] = ''
-        print("price error", link)
+        logger.info("price error at {}".format(link))
     try:
         d_data['address'] = soup.find_all("p", class_="text-100 pull-left")[0].get_text()
     except:
         d_data['address'] = ''
-        print("address error", link)
+        logger.info("address error at {}".format(link))
     try:
         d_data['build_year'] = soup.find_all("div",{"id": "yearbuild"})[0].get_text()
     except:
         d_data['build_year'] = ''
-        print("build_year error", link)
+        logger.info("build_year error at {}".format(link))
     try:
         d_data['date_found'] = datetime.datetime.today()
     except:
-        d_data['build_year'] = ''
-        print("datetime error. What year is it?!?!?", link)
+        d_data['date_found'] = ''
+        logger.info("datetime error at {}".format(link))
     try:
         d_data['num_rooms'] = soup.find_all("div",{"id": "equipmentid_1"})[0].get_text()
     except:
         d_data['num_rooms'] = ''
-        print("num_rooms error", link)
+        logger.info("num_rooms error at {}".format(link))
     try:  # space1 = living space
         d_data['space1'] = soup.find_all("div", {"id": "areaid_1"})[0].get_text()
     except:
         d_data['space1'] = ''
-        print("space1", link)
+        logger.info("space1 error at {}".format(link))
     try:  # space3 = outside space
         d_data['space3'] = soup.find_all("div", {"id": "areaid_3"})[0].get_text()
     except:
         d_data['space3'] = ''
-        print("space3 error", link)
+        logger.info("space3 error at {}".format(link))
     try:
         if soup.find_all("div", {"id": "equipmentid_13"}):
             d_data['parking_space'] = soup.find_all("div", {"id": "equipmentid_13"})[0].get_text()
-        else:
-            d_data['parking_space'] = ''
     except:
         d_data['parking_space'] = ''
-        print("parking_space", link)
+        logger.info("parking_space error at {}".format(link))
     try:
         if soup.find_all("div", {"id": "panel-energy-pass"})[0].get_text():
             d_data['energy'] = soup.find_all("div", {"id": "panel-energy-pass"})[0].get_text()
-        else:
-            d_data['energy'] = ''
     except:
         d_data['energy'] = ''
-        print("energy", link)
+        logger.info("energy error at {}".format(link))
     try:
         d_data['features'] = soup.find_all("div", {"id": "panelFeatures"})[0].get_text()
     except:
         d_data['features'] = ''
-        print('features', link)
+        logger.info("features error at {}".format(link))
     try:
         d_data['long_description'] = soup.find_all("div", {"id": "panelObjectdescription"})[0].get_text()
     except:
         d_data['long_description'] = ''
-        print("long_description", link)
+        logger.info("long description error at {}".format(link))
     try:
         d_data['location_description'] = soup.find_all("div", {"id": "panelLocationDescription"})[0].get_text()
     except:
         d_data['location_description'] = ''
-        print('location_description', link)
+        logger.info("location_description error at {}".format(link))
     try:
-        d_data['location_description'] = soup.find_all("div", {"id": "panelOther"})[0].get_text()
+        d_data['other_description'] = soup.find_all("div", {"id": "panelOther"})[0].get_text()
     except:
-        d_data['location_description'] = ''
-        print('location_description', link)
+        d_data['other_description'] = ''
+        logger.info("other_description error at {}".format(link))
     return d_data
 
 """
@@ -170,11 +181,12 @@ if __name__ == '__main__':
         except:
             print("fuck, selenium.common.exceptions.InvalidArgumentException: Message: invalid argument")
         #time.sleep(randint(5, 20))
-        #print(" ", cnt, " / ", len(list_compl_links) )
+
         if cnt % 1000 == 0 or cnt == len(list_compl_links):
             timetag = time.strftime("%Y%m%d-%H%M%S")
-            filename = 'immonet_all_pd_ads_{foo}.csv'
+            filename = '/home/jla/dev/beautiful_flats/data_immonet/ads/immonet_all_pd_ads_{foo}.csv'
             filename = filename.format(foo=timetag)
             df = pd.DataFrame(beautiful_homes)
             df.to_csv(filename)
-            print("file written to HDD")
+            logger.info("file written to HDD")
+    logger.info("All Immonet ads saved")

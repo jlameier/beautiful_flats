@@ -12,10 +12,10 @@ import pandas as pd
 import re
 import numpy as np
 
-df = pd.read_csv("immonet_all_pd_ads_20211007-221039.csv")
+df = pd.read_csv("/home/jla/dev/beautiful_flats/data_immowelt/ads/immowelt_all_pd_ads_20211018-012725.csv")
 
 # remove column views and kill lines with NaN
-df = df.drop(columns='num_views')
+# df = df.drop(columns='num_views')
 df = df.dropna()
 
 # convert to numbers

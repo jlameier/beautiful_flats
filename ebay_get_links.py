@@ -60,7 +60,7 @@ def get_pages(seedlink, baselink, maxcount):
         list_of_site_ads = soup.findAll(class_="aditem")
         dict_soup_ads[n] = list_of_site_ads
         logger.debug('{} href found at site {}'.format(len(list_of_site_ads), next_page))
-        time.sleep(randint(2, 18))
+        time.sleep(randint(3, 12))
 
     tmp = []
     for key in dict_soup_ads:
@@ -80,8 +80,23 @@ if __name__ == '__main__':
     all_ads = get_pages(seedlink, baselink, 50)
     # extract hrefs
     list_hrefs = find_hrefs(all_ads)
+    href_lst = find_hrefs(all_ads)
     logger.info('number of href found: {}'.format(len(list_hrefs)))
     # print(len(list_hrefs))
+
+    # if iterator % int(0.1 * max_num_pag) == 0 or iterator == max_num_pag:  # safe every 10% or at the end
+    timetag = time.strftime("%Y%m%d-%H%M%S")
+    filename = 'data_ebay/hrefs/ebay_all_hrefs_ads_{foo}.csv'
+    filename = filename.format(foo=timetag)
+
+    with open(filename, 'w') as result_file:
+        wr = csv.writer(result_file, dialect='excel', delimiter='\t')
+        wr.writerow(href_lst)
+        logger.info("hrefs saved to file {}".format(filename))
+
+    logger.info("hrefs saved")
+
+"""
     timetag = time.strftime("%Y%m%d-%H%M%S")
     filename = 'all_hrefs_ads_{foo}.csv'
     filename = filename.format(foo=timetag)
@@ -91,4 +106,4 @@ if __name__ == '__main__':
         wr = csv.writer(result_file, dialect='excel', delimiter='\t')
         wr.writerow(list_hrefs)
     logger.info('file saved as {}'.format(filename))
-
+"""
