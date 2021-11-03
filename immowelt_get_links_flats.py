@@ -32,23 +32,23 @@ logging.debug("test")
 
 BASELINK = 'https://www.immowelt.de/liste/bl-baden-wuerttemberg/haeuser/kaufen?sort=relevanz'
 SEEDLINK = 'https://www.immowelt.de/liste/bl'
-SEEDLINK_EXT1 = '/haeuser/kaufen?sort=relevanz'
-SEEDLINK_EXT2 = '/haeuser/kaufen?d=true&sd=DESC&sf=RELEVANCE&sp='
+SEEDLINK_EXT1 = '/wohnungen/kaufen?sort=relevanz'
+SEEDLINK_EXT2 = '/wohnungen/kaufen?d=true&sd=DESC&sf=RELEVANCE&sp='
 # link = SEEDLINK + federalstate + SEEDLINK_EXT2 + int
 
 federal_states = [
+    'Saarland',
+    'Hessen',
     'Baden-Wuerttemberg',
     'Bayern',
     'Berlin',
     'Brandenburg',
     'Bremen',
     'Hamburg',
-    'Hessen',
     'Mecklenburg-Vorpommern',
     'Niedersachsen',
     'Nordrhein-Westfalen',
     'Rheinland-Pfalz',
-    'Saarland',
     'Sachsen',
     'Sachsen-Anhalt',
     'Schleswig-Holstein',
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         logger.info("max number of pages found: {}".format(max_num_pag))
         for iterator in range(1, max_num_pag):
             # url = SEEDLINK + federalstate + SEEDLINK_EXT2 + int
-            soup_url = SEEDLINK + '-' +federal_states[bl_num-1] + SEEDLINK_EXT2 + str(iterator) # bl_num starts at 1
+            soup_url = SEEDLINK + '-' + federal_states[bl_num-1] + SEEDLINK_EXT2 + str(iterator) # bl_num starts at 1
 
 
             try:
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 
         #  if iterator % int(0.1 * max_num_pag) == 0 or iterator == max_num_pag:  # safe every 10% or at the end
         timetag = time.strftime("%Y%m%d-%H%M%S")
-        filename = 'data_immowelt/hrefs/immowelt_all_hrefs_ads_{foo}.csv'
+        filename = 'data_immowelt/hrefs/immowelt_hrefs_ads_flats_{foo}.csv'
         filename = filename.format(foo=timetag)
 
         with open(filename, 'w') as result_file:
